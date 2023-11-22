@@ -7,17 +7,23 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp()
 public class CenterStageTeleOp extends OpMode {
     MecanumDrive drive = new MecanumDrive();
-    Claw claw = new Claw();
-    //private Servo claw;
+    Intake intake = new Intake();
+    //Claw claw = new Claw();
+    //Wrist wrist = new Wrist();
 
-    Wrist wrist = new Wrist();
+    DroidLauncher launcher = new DroidLauncher();
+
+    RobotHanger hanger = new RobotHanger();
 
     @Override
     public void init() {
         drive.init(hardwareMap);
-        claw.init(hardwareMap);
-        wrist.init(hardwareMap);
+        //claw.init(hardwareMap);
+        //wrist.init(hardwareMap);
+        intake.init(hardwareMap);
         //claw = hardwareMap.get(Servo.class, "clawServo");
+        launcher.init(hardwareMap);
+        hanger.init(hardwareMap);
         telemetry.addData("init Done", "initDone");
     }
 
@@ -29,6 +35,37 @@ public class CenterStageTeleOp extends OpMode {
 
         drive.drive(forward, right, rotate);
 
+        if (gamepad1.left_bumper) {
+            intake.intakePixels();
+            telemetry.addData("Intaking", "intaking");
+        }
+        else if (gamepad1.right_bumper) {
+            intake.depositPixels();
+            telemetry.addData("Depositing", "depositing");
+        }
+        else {
+            intake.stopIntake();
+        }
+
+        if (gamepad1.square) {
+            launcher.launchDroid();
+            telemetry.addData("Droid Launcher", "launching");
+        }
+        else {
+            launcher.stopLauncher();
+            telemetry.addData("Droid Launcher", "stopping");
+        }
+
+        if (gamepad1.triangle) {
+            hanger.liftArm();
+            telemetry.addData("Robot Hanger", hanger.getPosition());
+        } else if (gamepad1.cross) {
+            hanger.downArm();
+            telemetry.addData("Robot Hanger", hanger.getPosition());
+        }
+
+
+        /**
         if (gamepad2.cross) {
             //claw.toggleClaw();
             //claw.setDirection(Servo.Direction.REVERSE);
@@ -41,7 +78,9 @@ public class CenterStageTeleOp extends OpMode {
             claw.closeClaw();
             telemetry.addData("Claw Postion", claw.getPosition());
         }
+        **/
 
+        /** Moving away from wrist as there is no claw
         if (gamepad2.dpad_up) {
             wrist.liftWrist();
             telemetry.addData("Wrist Postion", wrist.getPosition());
@@ -50,7 +89,7 @@ public class CenterStageTeleOp extends OpMode {
             wrist.downWrist();
             telemetry.addData("Wrist Postion", wrist.getPosition());
         }
-
+        **/
 
         /** Code to test individual wheels and config file
         if (gamepad1.y) {
