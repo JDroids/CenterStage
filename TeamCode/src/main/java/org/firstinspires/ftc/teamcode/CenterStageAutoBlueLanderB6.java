@@ -1,153 +1,114 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.acmerobotics.dashboard.FtcDashboard;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.processor.CenterStageVisionProcessor;
+import org.firstinspires.ftc.vision.VisionPortal;
+
+@Config
 @Autonomous
 public class CenterStageAutoBlueLanderB6 extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
 
-
-    public static double leg1 = 250.00;   //Strafe 280
-    public static double leg2 = 800.00;  //Go forward 800.00
-    public static double leg3 = 350.00;  //Rotate clockwise 350.00
-    public static double leg4 = 375.00;   //Go forward XX, 375, 650.00
-    public static double leg5 = 350.00;   //Rotate counter clockwise 350.00
-    public static double leg6 = 450.00;   //Go forward XX, 425, 550.00
-    public static double leg7 = 100.00;   //Go backward 75.00
-    public static double pause = 1000.00;
     public static double initialPause = 0.00;
+    //public static double testDistance = 23.74;
+    private ElapsedTime runtime = new ElapsedTime();
+    private final double MOTOR_TICKS = 537.7; //GOBILDA 5202
+    private final double INCHES_TO_TICKS = 45.30; //GOBILD 96mm Mecanum wheels
+    private final double INCHES_TO_NINETY_DEGREE = 19.50;
+    private final double INCHES_TO_ONEEIGHTY_DEGREE = 39.00;
+    private final double INCHES_TO_SPIKE = 26.00;
+    private final double INCHES_OFFSET = 0.00;
+    private final double INCHES_TO_STAGE_SPIKE = 49.00;
+    private final double INCHES_TO_STAGE = 36.00;
+    private final double INCHES_TO_NEXT_TILE = 22;
+    private final double DRIVE_MAX_POWER = 0.35;
 
-    MecanumDrive drive = new MecanumDrive();
+
+    AutoMecanumDrive drive = new AutoMecanumDrive();
+    //Intake intake = new Intake();
     Claw claw = new Claw();
     Wrist wrist = new Wrist();
+    private CenterStageVisionProcessor centerStageVisionProcessor; //processor to identify correct alignment on the image captured
+    private VisionPortal visionPortal;  //provides a way to handle the camera and the stream from the camera
 
     @Override
-    public void runOpMode() {
-        telemetry.addData("Autonomous", "Blue Lander");
-        telemetry.update();
+    public void runOpMode(){
         drive.init(hardwareMap);
         claw.init(hardwareMap);
         wrist.init(hardwareMap);
+        //intake.init(hardwareMap);
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1"); // get reference to to the webcamera hooked to the hub
+        centerStageVisionProcessor = new CenterStageVisionProcessor();
+        visionPortal = VisionPortal.easyCreateWithDefaults(webcamName, centerStageVisionProcessor);
 
         waitForStart();
-
-        // Step 0:  Add time for alliance partner to get out of the way
+        visionPortal.stopStreaming();
+        drive.setDriveMaxPower(DRIVE_MAX_POWER);
         runtime.reset();
         while (opModeIsActive() && (runtime.milliseconds() < initialPause)) {
-            telemetry.addData("Path", "Leg 0 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
+
         }
 
-        // Step 1:  Strafe so that robot does not get caught in the truss
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg1)) {
-            telemetry.addData("Path", "Leg 1: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 1, 0);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 1 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
+        drive.moveForward(inchesToTicks(INCHES_TO_SPIKE));
+
+        switch (centerStageVisionProcessor.getSelection()) {
+            case LEFT:
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_OFFSET));
+                depositRandomizedPixel();
+                //drive.moveBackward(INCHES_OFFSET);
+                //drive.moveCounterClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+                break;
+            case MIDDLE:
+                drive.moveForward(inchesToTicks(INCHES_OFFSET));
+                depositRandomizedPixel();
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+                break;
+            case RIGHT:
+                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_OFFSET));
+                depositRandomizedPixel();
+                drive.moveBackward(INCHES_OFFSET);
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+                break;
+            case NONE:
+                drive.moveForward(inchesToTicks(INCHES_OFFSET));
+                depositRandomizedPixel();
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+                break;
         }
 
-        // Step 2:  Drive Forward
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg2)) {
-            telemetry.addData("Path", "Leg 2: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(1, 0, 0);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 2 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
+    }
 
-        // Step 3:  Rotate 90 degree clockwise
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg3)) {
-            telemetry.addData("Path", "Leg 3: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 1);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 3 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
+    private double inchesToTicks(double distance){
+        return distance*INCHES_TO_TICKS;
+    }
 
-        // Step 4: Drive Forward
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg4)) {
-            telemetry.addData("Path", "Leg 4: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(1, 0, 0);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 4 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
-
-        // Step 5:  Rotate 90 degree counter clockwise
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg5)) {
-            telemetry.addData("Path", "Leg 5: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, -1);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 5 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
-
-        // Step 6:  Drive forward
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg6)) {
-            telemetry.addData("Path", "Leg 6: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(1, 0, 0);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 6 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
-
-        //Open claw and drop pixel
+    private void depositRandomizedPixel(){
+        wrist.downWrist();
         claw.openClaw();
-        telemetry.addData("Claw Postion", claw.getPosition());
-        telemetry.update();
-
-        // Step 7: Drive Backward
+        //intake.depositPixels();
         runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < leg7)) {
-            telemetry.addData("Path", "Leg 7: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(-1, 0, 0);
-        }
-        runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < pause)) {
-            telemetry.addData("Path", "Leg 7 Pause: %4.1f S Elapsed", runtime.milliseconds());
-            telemetry.update();
-            drive.drive(0, 0, 0);
-        }
-
-        //Close claw and to get ready for teleop
+        while (opModeIsActive() && (runtime.milliseconds() < 1000)) {  }
         claw.closeClaw();
         wrist.autoEndWrist();
-        telemetry.addData("Wrist Postion", wrist.getPosition());
-        telemetry.update();
+        //intake.stopIntake();
     }
+
 }

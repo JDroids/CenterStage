@@ -1,17 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
+//import com.acmerobotics.dashboard.FtcDashboard;
+//import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Config
+//@Config
 public class RobotHanger {
     private Servo stopArm;
 
-    public static double armDownPos = 1.00;
-    public static double armUpPos = 0.38;
-    public static double autoEndArmPos = 0.38;
+    public static double armDownPos = 0.425;
+    public static double armUpPos = 1.00;
+    public static double autoEndArmPos = 0.425;
 
     public enum States {
         DOWN,

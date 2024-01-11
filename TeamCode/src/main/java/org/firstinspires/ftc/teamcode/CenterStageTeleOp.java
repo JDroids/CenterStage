@@ -7,20 +7,20 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp()
 public class CenterStageTeleOp extends OpMode {
     MecanumDrive drive = new MecanumDrive();
-    Intake intake = new Intake();
-    //Claw claw = new Claw();
-    //Wrist wrist = new Wrist();
+    //Intake intake = new Intake();
+    Claw claw = new Claw();
+    Wrist wrist = new Wrist();
 
-    DroidLauncher launcher = new DroidLauncher();
-
+    //DroidLauncher launcher = new DroidLauncher();
+    BandedDroidLauncher launcher = new BandedDroidLauncher();
     RobotHanger hanger = new RobotHanger();
 
     @Override
     public void init() {
         drive.init(hardwareMap);
-        //claw.init(hardwareMap);
-        //wrist.init(hardwareMap);
-        intake.init(hardwareMap);
+        claw.init(hardwareMap);
+        wrist.init(hardwareMap);
+        //intake.init(hardwareMap);
         //claw = hardwareMap.get(Servo.class, "clawServo");
         launcher.init(hardwareMap);
         hanger.init(hardwareMap);
@@ -34,39 +34,46 @@ public class CenterStageTeleOp extends OpMode {
         double rotate = gamepad1.right_stick_x;
 
         drive.drive(forward, right, rotate);
-
-        if (gamepad1.left_bumper) {
+        /**
+        if (gamepad2.left_bumper) {
             intake.intakePixels();
             telemetry.addData("Intaking", "intaking");
         }
-        else if (gamepad1.right_bumper) {
+        else if (gamepad2.right_bumper) {
             intake.depositPixels();
             telemetry.addData("Depositing", "depositing");
         }
         else {
             intake.stopIntake();
         }
+         **/
 
-        if (gamepad1.square) {
-            launcher.launchDroid();
+        if (gamepad2.square) {
+            launcher.downPlaneArm();
             telemetry.addData("Droid Launcher", "launching");
         }
         else {
-            launcher.stopLauncher();
+            launcher.liftPlaneArm();
             telemetry.addData("Droid Launcher", "stopping");
         }
 
-        if (gamepad1.triangle) {
+        if (gamepad2.triangle) {
             hanger.liftArm();
             telemetry.addData("Robot Hanger", hanger.getPosition());
-        } else if (gamepad1.cross) {
+        }
+        /*
+        } else if (gamepad2.cross) {
+            hanger.downArm();
+            telemetry.addData("Robot Hanger", hanger.getPosition());
+        */
+        else {
             hanger.downArm();
             telemetry.addData("Robot Hanger", hanger.getPosition());
         }
 
 
-        /**
-        if (gamepad2.cross) {
+
+        if (gamepad2.left_bumper) {
             //claw.toggleClaw();
             //claw.setDirection(Servo.Direction.REVERSE);
             //claw.setPosition(0.6);
@@ -74,13 +81,13 @@ public class CenterStageTeleOp extends OpMode {
             claw.openClaw();
             telemetry.addData("Claw Postion", claw.getPosition());
         }
-        else if (gamepad2.triangle || gamepad2.right_bumper) {
+        else if (gamepad2.cross || gamepad2.right_bumper) {
             claw.closeClaw();
             telemetry.addData("Claw Postion", claw.getPosition());
         }
-        **/
 
-        /** Moving away from wrist as there is no claw
+
+         //Moving away from wrist as there is no claw
         if (gamepad2.dpad_up) {
             wrist.liftWrist();
             telemetry.addData("Wrist Postion", wrist.getPosition());
@@ -89,7 +96,7 @@ public class CenterStageTeleOp extends OpMode {
             wrist.downWrist();
             telemetry.addData("Wrist Postion", wrist.getPosition());
         }
-        **/
+
 
         /** Code to test individual wheels and config file
         if (gamepad1.y) {
