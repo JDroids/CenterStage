@@ -16,18 +16,19 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class CenterStageAutoRedLanderD6 extends LinearOpMode {
 
     public static double initialPause = 0.00;
+    public static double clawPause = 250;
+    public static double testPause = 1000;
     //public static double testDistance = 23.74;
     private ElapsedTime runtime = new ElapsedTime();
     private final double MOTOR_TICKS = 537.7; //GOBILDA 5202
-    private final double INCHES_TO_TICKS = 45.30; //GOBILD 96mm Mecanum wheels
-    private final double INCHES_TO_NINETY_DEGREE = 19.50;
+    private final double INCHES_TO_TICKS = 47.0; //GOBILD 96mm Mecanum wheels
+    private final double INCHES_TO_NINETY_DEGREE = 19.00;
     private final double INCHES_TO_ONEEIGHTY_DEGREE = 39.00;
-    private final double INCHES_TO_SPIKE = 26.00;
-    private final double INCHES_OFFSET = 0.00;
-    private final double INCHES_TO_STAGE_SPIKE = 49.00;
+    private final double INCHES_TO_SPIKE = 29.00;
+    private final double INCHES_OFFSET = 6.00;
     private final double INCHES_TO_STAGE = 36.00;
     private final double INCHES_TO_NEXT_TILE = 22;
-    private final double DRIVE_MAX_POWER = 0.35;
+    private final double DRIVE_MAX_POWER = 0.50;
 
 
     AutoMecanumDrive drive = new AutoMecanumDrive();
@@ -61,48 +62,67 @@ public class CenterStageAutoRedLanderD6 extends LinearOpMode {
         //FtcDashboard.getInstance().getTelemetry().addData("After init", "Testing...");
         //FtcDashboard.getInstance().getTelemetry().update();
 
-        drive.moveForward(inchesToTicks(INCHES_TO_SPIKE));
+        drive.moveForward(inchesToTicks(INCHES_TO_SPIKE-1));
         //FtcDashboard.getInstance().getTelemetry().addData("After Move Forward", "Testing...");
         //FtcDashboard.getInstance().getTelemetry().update();
 
         switch (centerStageVisionProcessor.getSelection()) {
             case LEFT:
+                wrist.downWrist();
                 drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveBackward(INCHES_OFFSET);
-                drive.moveClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
-
-                break;
-            case MIDDLE:
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
+                drive.moveForward(inchesToTicks(2));
+                claw.openClaw();
+                drive.moveBackward(inchesToTicks(2 ));
+                claw.closeClaw();
+                wrist.liftWrist();
                 drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
-
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE-2));
+                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE *4 - INCHES_OFFSET));
                 break;
+
+            case MIDDLE:
+                drive.moveClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE));
+                wrist.downWrist();
+                drive.moveBackward(inchesToTicks(2*INCHES_OFFSET + 5));
+                claw.openClaw();
+                drive.moveBackward(inchesToTicks(1));
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE+1));
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE *4 - INCHES_OFFSET));
+                break;
+
             case RIGHT:
                 drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE-INCHES_OFFSET));
-
+                drive.moveBackward(inchesToTicks(3 ));
+                wrist.downWrist();
+                drive.moveForward(inchesToTicks(2 ));
+                claw.openClaw();
+                drive.moveBackward(inchesToTicks(1 ));
+                wrist.liftWrist();
+                claw.closeClaw();
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE ));
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE-1));
+                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE *4 - INCHES_OFFSET));
                 break;
             case NONE:
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
+                drive.moveClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE));
+                wrist.downWrist();
+                drive.moveBackward(inchesToTicks(2*INCHES_OFFSET + 3));
+                claw.openClaw();
                 drive.moveBackward(inchesToTicks(INCHES_OFFSET));
-                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE_SPIKE));
-
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE *4 - INCHES_OFFSET));
                 break;
         }
-        drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-        drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE));
-        drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-        drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+        //drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+        //drive.moveForward(inchesToTicks(INCHES_TO_NEXT_TILE));
+        //drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+        //drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
 
 
     }

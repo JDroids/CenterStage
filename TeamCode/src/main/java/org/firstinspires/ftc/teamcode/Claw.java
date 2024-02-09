@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-//import com.acmerobotics.dashboard.FtcDashboard;
-//import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-//@Config
+@Config
 public class Claw {
     private Servo claw;
 
+    public static double clawClosedPos = 0.4;
     public static double clawOpenPos = 0.60;
-    public static double clawClosedPos = 0.40;
+
 
     public enum States {
         CLOSED,

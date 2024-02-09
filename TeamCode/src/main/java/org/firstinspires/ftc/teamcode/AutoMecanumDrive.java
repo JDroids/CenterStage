@@ -35,7 +35,7 @@ public class AutoMecanumDrive {
         setPowers();
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || rearLeftMotor.isBusy() || rearRightMotor.isBusy()) {
-            updateTelemetry();
+            //updateTelemetry();
         }
         resetEncoders();
 
@@ -49,7 +49,7 @@ public class AutoMecanumDrive {
         setPowers();
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || rearLeftMotor.isBusy() || rearRightMotor.isBusy()) {
-            updateTelemetry();
+            //updateTelemetry();
         }
         resetEncoders();
 
@@ -63,7 +63,7 @@ public class AutoMecanumDrive {
         setPowers();
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || rearLeftMotor.isBusy() || rearRightMotor.isBusy()) {
-            updateTelemetry();
+            //updateTelemetry();
         }
         resetEncoders();
 
@@ -77,7 +77,7 @@ public class AutoMecanumDrive {
         setPowers();
 
         while (frontLeftMotor.isBusy() || frontRightMotor.isBusy() || rearLeftMotor.isBusy() || rearRightMotor.isBusy()) {
-            updateTelemetry();
+           //updateTelemetry();
         }
         resetEncoders();
 

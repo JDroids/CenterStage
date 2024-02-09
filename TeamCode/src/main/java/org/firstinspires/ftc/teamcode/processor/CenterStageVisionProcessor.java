@@ -12,9 +12,9 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 public class CenterStageVisionProcessor implements VisionProcessor {
-    public Rect rectLeft = new Rect(0, 130, 120, 80); //draw left rectangle
-    public Rect rectMiddle = new Rect(270, 60, 120, 80); //draw center rectangle
-    public Rect rectRight = new Rect(520, 110, 120, 80); //draw right rectangle
+    public Rect rectLeft = new Rect(0, 160, 120, 80); //draw left rectangle y=130
+    public Rect rectMiddle = new Rect(270, 130, 120, 80); //draw center rectangle y=60
+    public Rect rectRight = new Rect(520, 150, 120, 80); //draw right rectangle y=110
     Selected selection = Selected.NONE;
     Mat submat = new Mat();
     Mat hsvMat = new Mat();

@@ -16,16 +16,19 @@ import org.firstinspires.ftc.vision.VisionPortal;
 public class CenterStageAutoBlueStageB6 extends LinearOpMode {
 
     public static double initialPause = 0.00;
+    public static double clawPause = 250;
+    public static double testPause = 1000;
     //public static double testDistance = 23.74;
     private ElapsedTime runtime = new ElapsedTime();
     private final double MOTOR_TICKS = 537.7; //GOBILDA 5202
-    private final double INCHES_TO_TICKS = 45.30; //GOBILD 96mm Mecanum wheels
+    private final double INCHES_TO_TICKS = 47.0; //GOBILD 96mm Mecanum wheels
     private final double INCHES_TO_NINETY_DEGREE = 19.00;
     private final double INCHES_TO_ONEEIGHTY_DEGREE = 39.00;
-    private final double INCHES_TO_SPIKE = 26.00;
-    private final double INCHES_OFFSET = 0.00;
+    private final double INCHES_TO_SPIKE = 29.00;
+    private final double INCHES_OFFSET = 6.00;
     private final double INCHES_TO_STAGE = 36.00;
-    private final double DRIVE_MAX_POWER = 0.35;
+    private final double INCHES_TO_NEXT_TILE = 22;
+    private final double DRIVE_MAX_POWER = 0.50;
 
 
     AutoMecanumDrive drive = new AutoMecanumDrive();
@@ -57,35 +60,56 @@ public class CenterStageAutoBlueStageB6 extends LinearOpMode {
 
         switch (centerStageVisionProcessor.getSelection()) {
             case LEFT:
-                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE+1));
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE-INCHES_OFFSET));
+                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE+1));
+                wrist.downWrist();
+                drive.moveBackward(inchesToTicks(19));
+                claw.openClaw();
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET -3));
                 break;
             case MIDDLE:
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
-                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE+1));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
-                break;
-            case RIGHT:
-                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
-                drive.moveClockwise(inchesToTicks(INCHES_TO_ONEEIGHTY_DEGREE+1));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
-                break;
-            case NONE:
-                drive.moveForward(inchesToTicks(INCHES_OFFSET));
-                depositRandomizedPixel();
-                drive.moveBackward(inchesToTicks(INCHES_OFFSET));
-                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE+1));
-                drive.moveForward(inchesToTicks(INCHES_TO_STAGE));
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET ));
+                wrist.downWrist();
+                drive.moveForward(inchesToTicks(3 ));
+                claw.openClaw();
+                //runtime.reset();
+                //while (opModeIsActive() && (runtime.milliseconds() < clawPause)) {  }
+                drive.moveBackward(inchesToTicks(3));
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE - 7));
                 break;
 
+            case RIGHT:
+                drive.moveClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveBackward(inchesToTicks(3 ));
+                wrist.downWrist();
+                drive.moveForward(inchesToTicks(5 ));
+                claw.openClaw();
+                drive.moveBackward(inchesToTicks(2 ));
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveBackward(inchesToTicks(INCHES_TO_STAGE - INCHES_OFFSET -3));
+                break;
+            case NONE:
+                drive.moveBackward(inchesToTicks(INCHES_OFFSET ));
+                wrist.downWrist();
+                drive.moveForward(inchesToTicks(3 ));
+                claw.openClaw();
+                //runtime.reset();
+                //while (opModeIsActive() && (runtime.milliseconds() < clawPause)) {  }
+                drive.moveBackward(inchesToTicks(3));
+                claw.closeClaw();
+                wrist.liftWrist();
+                drive.moveCounterClockwise(inchesToTicks(INCHES_TO_NINETY_DEGREE));
+                drive.moveForward(inchesToTicks(INCHES_TO_STAGE - 7));
+                break;
         }
+        //FtcDashboard.getInstance().getTelemetry().addData("After init", "Moved to stage");
+        //FtcDashboard.getInstance().getTelemetry().update();
 
 
     }
@@ -96,13 +120,15 @@ public class CenterStageAutoBlueStageB6 extends LinearOpMode {
 
     private void depositRandomizedPixel(){
         wrist.downWrist();
+        drive.moveForward(inchesToTicks(INCHES_OFFSET));
         claw.openClaw();
-        //intake.depositPixels();
         runtime.reset();
-        while (opModeIsActive() && (runtime.milliseconds() < 1000)) {  }
+        while (opModeIsActive() && (runtime.milliseconds() < clawPause)) {  }
+        drive.moveBackward(inchesToTicks(INCHES_OFFSET));
         claw.closeClaw();
-        wrist.autoEndWrist();
-        //intake.stopIntake();
+        runtime.reset();
+        while (opModeIsActive() && (runtime.milliseconds() < clawPause)) {  }
+        wrist.liftWrist();
     }
 
 

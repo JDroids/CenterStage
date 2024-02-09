@@ -1,16 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 //import com.acmerobotics.dashboard.FtcDashboard;
-//import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-//@Config
+@Config
 public class BandedDroidLauncher {
     private Servo planeServo;
 
-    public static double planeDownPos = 0.00;
-    public static double planeUpPos = 1.00;
+    public static double planeDownPos = 0.6;
+    public static double planeUpPos = 0.0;
 
     public enum States {
         DOWN,
